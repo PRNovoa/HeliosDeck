@@ -69,6 +69,7 @@ export function DashboardGrid() {
     initialWidth: 1200,
   });
   const enabledWidgets = getSortedWidgets(true);
+  const isPhoneGrid = width < DASHBOARD_LAYOUT_BREAKPOINTS.xs;
 
   const layouts = useMemo(() => {
     const enabledIds = new Set(enabledWidgets.map((widget) => widget.id));
@@ -133,11 +134,11 @@ export function DashboardGrid() {
           layouts={layouts}
           breakpoints={DASHBOARD_LAYOUT_BREAKPOINTS}
           cols={DASHBOARD_LAYOUT_COLUMNS}
-          rowHeight={78}
+          rowHeight={isPhoneGrid ? 72 : 78}
           dragConfig={{ enabled: true, handle: ".dragHandle", threshold: 4 }}
           resizeConfig={{ enabled: true, handles: ["se"] }}
           onLayoutChange={handleLayoutChange}
-          margin={[16, 16]}
+          margin={isPhoneGrid ? [10, 12] : [16, 16]}
           containerPadding={[0, 0]}
           compactor={verticalCompactor}
         >

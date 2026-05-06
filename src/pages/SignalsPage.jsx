@@ -49,9 +49,9 @@ export function SignalsPage() {
   ).length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-3 py-6 sm:px-4 sm:py-8">
       <header className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-4">
-        <h1 className="text-xl font-bold tracking-widest uppercase text-[var(--color-text-primary)]">
+        <h1 className="text-lg font-bold uppercase tracking-widest text-[var(--color-text-primary)] sm:text-xl">
           SIGNAL CATALOGUE
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)]">
@@ -65,7 +65,11 @@ export function SignalsPage() {
           </strong>
         </p>
 
-        <div className="flex gap-2" role="group" aria-label="Filter signals">
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filter signals"
+        >
           {FILTERS.map((f) => (
             <button
               key={f}
@@ -87,7 +91,7 @@ export function SignalsPage() {
       <SignalConstellationMap />
 
       <div className="overflow-x-auto" role="region" aria-label="Signal list">
-        <table className="w-full text-xs border-collapse">
+        <table className="min-w-[58rem] w-full border-collapse text-xs">
           <thead>
             <tr className="border-b border-[var(--color-border)]">
               {[
