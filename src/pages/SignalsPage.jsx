@@ -1,0 +1,153 @@
+﻿import { useState } from "react";
+import { Link } from "react-router-dom";
+import { SIGNAL_REGISTRY, SIGNAL_STATUS } from "@/lib/signalRegistry.js";
+
+const STATUS_COLOURS = {
+  [SIGNAL_STATUS.LIVE]: "var(--color-geo-green)",
+  [SIGNAL_STATUS.PENDING]: "var(--color-solar-amber)",
+  [SIGNAL_STATUS.MOCK]: "var(--color-text-muted)",
+};
+
+const FILTERS = ["ALL", SIGNAL_STATUS.LIVE, SIGNAL_STATUS.PENDING];
+
+function formatCadence(seconds) {
+  if (!seconds) return "—";
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  return `${Math.round(seconds / 3600)}h`;
+}
+
+export function SignalsPage() {
+  const [filter, setFilter] = useState("ALL");
+
+  const visible =
+    filter === "ALL"
+      ? SIGNAL_REGISTRY
+      : SIGNAL_REGISTRY.filter((s) => s.status === filter);
+
+  const liveCount = SIGNAL_REGISTRY.filter(
+    (s) => s.status === SIGNAL_STATUS.LIVE,
+  ).length;
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col gap-6">
+      <header className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-4">
+        <h1 className="text-xl font-bold tracking-widest uppercase text-[var(--color-text-primary)]">
+          SIGNAL CATALOGUE
+        </h1>
+        <p className="text-sm text-[var(--color-text-secondary)]">
+          All geophysical and heliophysical signals tracked by Helios Deck.{" "}
+          <strong style={{ color: "var(--color-geo-green)" }}>
+            {liveCount} LIVE
+          </strong>{" "}
+          /{" "}
+          <strong style={{ color: "var(--color-solar-amber)" }}>
+            {SIGNAL_REGISTRY.length - liveCount} PENDING
+          </strong>
+        </p>
+
+        <div className="flex gap-2" role="group" aria-label="Filter signals">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              className={[
+                "text-[0.6rem] font-bold tracking-widest uppercase px-2.5 py-1 rounded border transition-colors font-[var(--font-mono)]",
+                filter === f
+                  ? "text-[var(--color-accent-orange)] border-[var(--color-accent-orange)] bg-[var(--color-accent-orange-dim)]"
+                  : "text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-primary)]",
+              ].join(" ")}
+              onClick={() => setFilter(f)}
+              aria-pressed={filter === f}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <div className="overflow-x-auto" role="region" aria-label="Signal list">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-[var(--color-border)]">
+              {[
+                "SIGNAL",
+                "TOPIC",
+                "PROVIDER",
+                "UNIT",
+                "CADENCE",
+                "STATUS",
+                "IMPL",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="text-left py-2 px-3 text-[0.6rem] font-bold tracking-widest uppercase text-[var(--color-text-muted)] font-[var(--font-mono)]"
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((s) => (
+              <tr
+                key={s.id}
+                className="border-b border-[var(--color-border)] hover:bg-[var(--color-bg-secondary)] transition-colors"
+              >
+                <td className="py-2 px-3">
+                  <Link
+                    to={s.route}
+                    className="font-bold text-[var(--color-text-primary)] hover:text-[var(--color-accent-orange)] transition-colors"
+                  >
+                    <span aria-hidden="true">{s.icon}</span> {s.label}
+                  </Link>
+                </td>
+                <td className="py-2 px-3 font-[var(--font-mono)] text-[var(--color-text-secondary)]">
+                  {s.topic}
+                </td>
+                <td className="py-2 px-3">
+                  <a
+                    href={s.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--color-accent-cyan)] hover:text-[var(--color-accent-orange)] transition-colors"
+                  >
+                    {s.sourceLabel}
+                  </a>
+                </td>
+                <td className="py-2 px-3 font-[var(--font-mono)] text-[var(--color-text-secondary)]">
+                  {s.unit}
+                </td>
+                <td className="py-2 px-3 font-[var(--font-mono)] text-[var(--color-text-secondary)]">
+                  {formatCadence(s.cadenceSeconds)}
+                </td>
+                <td className="py-2 px-3">
+                  <span
+                    className="font-bold font-[var(--font-mono)]"
+                    style={{ color: STATUS_COLOURS[s.status] }}
+                    aria-label={`Status: ${s.status}`}
+                  >
+                    ● {s.status}
+                  </span>
+                </td>
+                <td className="py-2 px-3 text-center">
+                  <span
+                    className={
+                      s.implemented
+                        ? "text-[var(--color-accent-green)] font-bold"
+                        : "text-[var(--color-text-muted)]"
+                    }
+                    aria-label={
+                      s.implemented ? "Implemented" : "Not implemented"
+                    }
+                  >
+                    {s.implemented ? "✓" : "–"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
