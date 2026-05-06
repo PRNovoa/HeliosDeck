@@ -184,8 +184,8 @@ export const WIDGET_REGISTRY = {
   },
   [SIGNAL.SOLAR_RADIATION]: {
     id: SIGNAL.SOLAR_RADIATION,
-    label: "Solar Radiation",
-    description: "Solar radiation flux data",
+    label: "GOES X-Ray Flux",
+    description: "GOES primary X-ray flux samples from NOAA SWPC",
     defaultEnabled: true,
     defaultOrder: 9,
     defaultLayouts: {

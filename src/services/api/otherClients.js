@@ -1,28 +1,23 @@
 /**
- * ISS API stub clients for other signals.
+ * API clients for public heliophysical and geophysical feeds.
  * -------------------------------------------------------
- * NASA DONKI — Solar Flares, CMEs
- * Status: Requires API key. Possible CORS in production.
- * Use Vite proxy (/api/nasa) in dev. Use MOCK in prod until proxy/key confirmed.
+ * These functions only handle HTTP. Normalization happens in
+ * src/services/normalizers.
  *
- * NOAA SWPC — Solar Wind, Aurora
- * Status: CORS unconfirmed. Verify before enabling.
- *
- * GFZ — Kp Index
- * Status: CORS unconfirmed. Verify before enabling.
+ * NASA DONKI: solar flares and CMEs, optional VITE_NASA_API_KEY.
+ * NOAA SWPC: Kp, alerts, solar wind, aurora, X-ray flux, F10.7 flux.
  */
 
-const NASA_BASE = import.meta.env.DEV
-  ? "/api/nasa" // → Vite proxy → api.nasa.gov
-  : "https://api.nasa.gov"; // Direct in production (may need CORS fix)
-
+const NASA_BASE = import.meta.env.DEV ? "/api/nasa" : "https://api.nasa.gov";
 const NASA_KEY = import.meta.env.VITE_NASA_API_KEY ?? "DEMO_KEY";
 
-// ── NASA DONKI ────────────────────────────────────────────────────────────────
+const NOAA_BASE = import.meta.env.DEV
+  ? "/api/noaa"
+  : "https://services.swpc.noaa.gov";
 
 /**
  * Fetch solar flare events.
- * @param {{ startDate: string, endDate: string }} params — YYYY-MM-DD
+ * @param {{ startDate: string, endDate: string }} params - YYYY-MM-DD
  * @returns {Promise<object[]>}
  */
 export async function fetchSolarFlares({ startDate, endDate } = {}) {
@@ -41,7 +36,7 @@ export async function fetchSolarFlares({ startDate, endDate } = {}) {
 
 /**
  * Fetch coronal mass ejection events.
- * @param {{ startDate: string, endDate: string }} params
+ * @param {{ startDate: string, endDate: string }} params - YYYY-MM-DD
  * @returns {Promise<object[]>}
  */
 export async function fetchCME({ startDate, endDate } = {}) {
@@ -58,23 +53,18 @@ export async function fetchCME({ startDate, endDate } = {}) {
   return res.json();
 }
 
-// ── NOAA SWPC ─────────────────────────────────────────────────────────────────
-// TODO: Confirm CORS status before removing MOCK flag.
-
-const NOAA_BASE = import.meta.env.DEV
-  ? "/api/noaa"
-  : "https://services.swpc.noaa.gov";
-
 /**
- * Fetch solar wind 1-minute data (last 2 hours).
- * @returns {Promise<number[][]>}
+ * Fetch NOAA solar wind plasma 1-minute samples for the last day.
+ * @returns {Promise<Array[]>}
  */
 export async function fetchSolarWind() {
-  // NOAA returns a JSON array, first element is headers
   const res = await fetch(
     `${NOAA_BASE}/products/solar-wind/plasma-1-day.json`,
   );
-  if (!res.ok) throw new Error(`NOAA solar wind error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA solar wind error: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -84,7 +74,10 @@ export async function fetchSolarWind() {
  */
 export async function fetchSpaceWeatherAlerts() {
   const res = await fetch(`${NOAA_BASE}/products/alerts.json`);
-  if (!res.ok) throw new Error(`NOAA alerts error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA alerts error: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -94,7 +87,10 @@ export async function fetchSpaceWeatherAlerts() {
  */
 export async function fetchSolarRadioFlux() {
   const res = await fetch(`${NOAA_BASE}/json/f107_cm_flux.json`);
-  if (!res.ok) throw new Error(`NOAA F10.7 flux error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA F10.7 flux error: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -104,27 +100,36 @@ export async function fetchSolarRadioFlux() {
  */
 export async function fetchAurora() {
   const res = await fetch(`${NOAA_BASE}/json/ovation_aurora_latest.json`);
-  if (!res.ok) throw new Error(`NOAA aurora error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA aurora error: ${res.status}`);
+  }
   return res.json();
 }
 
 /**
- * Fetch GOES X-ray flux samples for the last day.
+ * Fetch GOES primary X-ray flux samples for the last day.
  * @returns {Promise<object[]>}
  */
 export async function fetchSolarRadiation() {
   const res = await fetch(`${NOAA_BASE}/json/goes/primary/xrays-1-day.json`);
-  if (!res.ok) throw new Error(`NOAA radiation error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA radiation error: ${res.status}`);
+  }
   return res.json();
 }
 
 /**
- * Fetch latest Kp index values.
- * @returns {Promise<number[][]>}
+ * Fetch latest NOAA planetary Kp index values.
+ * @returns {Promise<object[]>}
  */
 export async function fetchKpIndex() {
   const res = await fetch(`${NOAA_BASE}/products/noaa-planetary-k-index.json`);
-  if (!res.ok) throw new Error(`NOAA Kp error: ${res.status}`);
+  if (!res.ok) {
+    const message = await readProviderError(res);
+    throw new Error(message || `NOAA Kp error: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -137,6 +142,11 @@ async function readProviderError(res) {
       ? `${providerCode}: ${providerMessage}`
       : providerMessage;
   } catch {
-    return null;
+    try {
+      const text = await res.text();
+      return text ? `${res.status}: ${text.slice(0, 160)}` : null;
+    } catch {
+      return null;
+    }
   }
 }

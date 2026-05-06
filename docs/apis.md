@@ -10,7 +10,7 @@
 | NOAA F10.7 Solar Radio Flux | NOAA SWPC | Solar Radio Flux | None | Verify prod | LIVE | `useSolarRadioFlux.js` | `normalizeSolarRadioFlux.js` | `SolarRadioFluxWidget` |
 | NASA DONKI CME | NASA DONKI | CME Events | `VITE_NASA_API_KEY` optional | Dev proxy, direct prod | LIVE_WITH_KEY | `useCME.js` | `normalizeCME.js` | `CMEWidget` |
 | NOAA Ovation Aurora | NOAA SWPC | Aurora Oval | None | Verify prod | LIVE | `useAurora.js` | `normalizeAurora.js` | `AuroraWidget` |
-| NOAA GOES X-ray Flux | NOAA SWPC | Solar Radiation | None | Verify prod | LIVE | `useSolarRadiation.js` | `normalizeSolarRadiation.js` | `SolarRadiationWidget` |
+| NOAA GOES X-ray Flux | NOAA SWPC | GOES X-Ray Flux | None | Verify prod | LIVE | `useSolarRadiation.js` | `normalizeSolarRadiation.js` | `SolarRadiationWidget` |
 
 ## NASA API Key
 
@@ -31,11 +31,12 @@ Frontend Vite environment variables are public in the final JavaScript bundle. D
 | Signal | Refresh Rate | staleTime | Notes |
 |---|---:|---:|---|
 | ISS Position | 5 s | 4 s | Position changes continuously |
-| Kp Index | 5 min | 3 min | NOAA planetary K index feed |
+| Kp Index | 5 min | 3 min | NOAA planetary K index product; provider index updates are reflected through SWPC product refreshes |
 | Solar Flares | On view / cached | 30 min | DONKI event list for the selected day range |
 | Space Weather Alerts | 5 min | 5 min | Watches, warnings, alerts and summaries |
 | Solar Wind | 2 min | 1 min | NOAA 1-day plasma file |
 | Solar Radio Flux | 1 h | 1 h | F10.7 observations update a few times daily |
+| GOES X-Ray Flux | 2 min | 1 min | GOES primary XRS samples filtered to the long channel |
 
 ## Signal Relationships
 

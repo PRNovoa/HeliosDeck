@@ -21,7 +21,7 @@ export function SolarRadiationWidget() {
 
   if (isLoading) {
     return (
-      <DashboardCard title="SOLAR RADIATION" accent="var(--color-solar-gold)">
+      <DashboardCard title="GOES X-RAY FLUX" accent="var(--color-solar-gold)">
         <SkeletonBlock lines={4} />
       </DashboardCard>
     );
@@ -29,8 +29,8 @@ export function SolarRadiationWidget() {
 
   if (isError) {
     return (
-      <DashboardCard title="SOLAR RADIATION" accent="var(--color-solar-gold)">
-        <ErrorFallback error={error} signal="Solar Radiation" onRetry={refetch} />
+      <DashboardCard title="GOES X-RAY FLUX" accent="var(--color-solar-gold)">
+        <ErrorFallback error={error} signal="GOES X-Ray Flux" onRetry={refetch} />
       </DashboardCard>
     );
   }
@@ -40,7 +40,7 @@ export function SolarRadiationWidget() {
 
   if (!latest) {
     return (
-      <DashboardCard title="SOLAR RADIATION" accent="var(--color-solar-gold)">
+      <DashboardCard title="GOES X-RAY FLUX" accent="var(--color-solar-gold)">
         <EmptyState message="No X-ray flux samples" icon="*" />
       </DashboardCard>
     );
@@ -52,7 +52,7 @@ export function SolarRadiationWidget() {
   }));
 
   return (
-    <DashboardCard title="SOLAR RADIATION" accent="var(--color-solar-gold)">
+    <DashboardCard title="GOES X-RAY FLUX" accent="var(--color-solar-gold)">
       <div className="flex flex-col gap-3">
         <div className="flex items-end justify-between gap-3">
           <div>

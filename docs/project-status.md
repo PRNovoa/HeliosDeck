@@ -15,7 +15,7 @@ _Last updated: May 6, 2026_
 | Solar Radio Flux | SOLAR | NOAA SWPC | LIVE | `normalizeSolarRadioFlux.js` | `useSolarRadioFlux.js` | `SolarRadioFluxWidget` | Signals catalogue |
 | CME Events | HELIOSPHERIC | NASA DONKI | LIVE_WITH_KEY | `normalizeCME.js` | `useCME.js` | `CMEWidget` | `CMEPage` |
 | Aurora Oval | GEOMAGNETIC | NOAA SWPC | LIVE | `normalizeAurora.js` | `useAurora.js` | `AuroraWidget` | `AuroraPage` |
-| Solar Radiation | RADIATION | NOAA SWPC | LIVE | `normalizeSolarRadiation.js` | `useSolarRadiation.js` | `SolarRadiationWidget` | `SolarRadiationPage` |
+| GOES X-Ray Flux | RADIATION | NOAA SWPC | LIVE | `normalizeSolarRadiation.js` | `useSolarRadiation.js` | `SolarRadiationWidget` | `SolarRadiationPage` |
 
 ## Remaining External Constraints
 

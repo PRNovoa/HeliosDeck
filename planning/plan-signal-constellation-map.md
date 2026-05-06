@@ -70,7 +70,7 @@ Solar source:
 
 - Solar Radio Flux
 - Solar Flares
-- Solar Radiation
+- GOES X-Ray Flux
 - CME Events
 
 Plasma transit:

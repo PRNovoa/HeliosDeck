@@ -57,7 +57,7 @@ Frontend Vite env vars are public in the final bundle. Do not treat `VITE_NASA_A
 | Solar Radio Flux | NOAA SWPC | LIVE |
 | CME Events | NASA DONKI | LIVE_WITH_KEY |
 | Aurora Oval | NOAA SWPC | LIVE |
-| Solar Radiation | NOAA SWPC | LIVE |
+| GOES X-Ray Flux | NOAA SWPC | LIVE |
 
 See [docs/apis.md](docs/apis.md) for endpoint, CORS, hook, normalizer, and widget details.
 

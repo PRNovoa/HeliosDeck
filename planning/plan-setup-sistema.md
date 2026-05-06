@@ -357,7 +357,7 @@ Obtener clave NASA gratuita: https://api.nasa.gov
 | CME (NASA DONKI)            | ✅ Con clave | `VITE_NASA_API_KEY` | `/api/nasa`  |
 | Solar Wind (NOAA SWPC)      | ⚠️ Variable  | No                  | `/api/noaa`  |
 | Aurora (NOAA SWPC)          | ⚠️ Variable  | No                  | `/api/noaa`  |
-| Solar Radiation (NOAA SWPC) | ⚠️ Variable  | No                  | `/api/noaa`  |
+| GOES X-Ray Flux (NOAA SWPC) | ⚠️ Variable  | No                  | `/api/noaa`  |
 
 ---
 
@@ -382,7 +382,7 @@ Una vez completado el setup, el orden sugerido de desarrollo es:
 2. **CME hook + widget** — `useCME()` + `CMEWidget`
 3. **Solar Wind hook + widget** — `useSolarWind()` + `SolarWindWidget`
 4. **Aurora hook + widget** — `useAurora()` + mapa SVG de la oval
-5. **Solar Radiation hook + widget** — `useSolarRadiation()` + gráfico GOES
+5. **GOES X-Ray Flux hook + widget** — `useSolarRadiation()` + gráfico GOES
 6. **Reorder de widgets** — drag o botones up/down en `WidgetSelector`
 7. **Modo offline / mock fixtures** — activado con `VITE_USE_MOCKS=true`
 8. **Tests** — Vitest + Testing Library para normalizers y hooks
