@@ -108,6 +108,8 @@ npm run lint
 
 `vercel.json` rewrites all routes to `index.html` for SPA routing. Local development uses Vite proxies for NASA and NOAA; production uses direct provider URLs, so NOAA CORS should be verified after deployment.
 
+For deployment, add `VITE_NASA_API_KEY` in Vercel Project Settings for Production, Preview, and Development. The app falls back to `DEMO_KEY`, but NASA DONKI widgets can hit quota limits without your own key.
+
 ## License
 
 MIT

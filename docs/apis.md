@@ -47,4 +47,4 @@ Frontend Vite environment variables are public in the final JavaScript bundle. D
 | Space Weather Alerts | Kp Index / Solar Wind | NOAA alerts summarize operational storm thresholds and watches |
 | Solar Wind | Kp Index | High solar wind speed and southward IMF can drive geomagnetic activity |
 | Solar Wind | Aurora Oval | Solar wind pressure and speed modulate auroral activity |
-| Solar Radio Flux | Solar Flares / Radiation | F10.7 cm flux is a solar activity proxy |
+| Solar Radio Flux | Solar Flares / GOES X-Ray Flux | F10.7 cm flux is a solar activity proxy |

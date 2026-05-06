@@ -1,145 +1,106 @@
-﻿# Helios Deck — Architecture
+# Helios Deck - Architecture
 
 ## Overview
 
-Helios Deck is a **pure client-side React application** (no backend, no SSR) that aggregates real-time geophysical and heliophysical signals from public APIs. It runs as a Static SPA on Vercel.
+Helios Deck is a client-side React/Vite static SPA intended for Vercel. It uses
+public orbital and space-weather APIs, normalizes heterogeneous payloads into a
+shared signal contract, and renders them through React Query-backed widgets and
+signal pages.
 
----
+There is no custom backend, SSR layer, database, or TypeScript conversion.
 
 ## Data Pipeline
 
-Every signal follows a strict unidirectional pipeline:
+Every live signal follows this pipeline:
 
-```
-Public API (REST/JSON)
-        │
-        ▼
-   api client          (src/services/api/)
-   fetch + throw       issClient.js / otherClients.js
-        │
-        ▼
-   normalizer          (src/services/normalizers/)
-   → NormalizedSignal  normalizeISS / normalizeKpIndex / normalizeSolarFlare
-        │
-        ▼
-   React Query hook    (src/hooks/)
-   cached + polled     useISSPosition / useKpIndex / useSolarFlares
-        │
-        ▼
-   Widget / Chart      (src/components/widgets/, src/components/charts/)
-        │
-        ▼
-   Signal page         (src/pages/  wrapped in SignalPageLayout)
-        │
-        ▼
-   Browser
+```txt
+Public REST/JSON API
+-> API client in src/services/api
+-> normalizer in src/services/normalizers
+-> TanStack React Query hook in src/hooks
+-> widget/page UI
 ```
 
-The **NormalizedSignal contract** (`src/lib/normalizedSignal.js`) ensures every signal produces an identical top-level shape, making alerting, display, and testing uniform across all data sources.
+Network calls stay in `src/services/api`. Widgets and pages consume hooks and do
+not fetch directly.
 
----
+## Current Signals
 
-## Directory Structure
+| Signal | Provider | Hook | Widget/Page status |
+|---|---|---|---|
+| ISS Position | wheretheiss.at | `useISSPosition` | Dashboard widget + signal page |
+| Kp Index | NOAA SWPC | `useKpIndex` | Dashboard widget + signal page |
+| Solar Flares | NASA DONKI | `useSolarFlares` | Dashboard widget + signal page |
+| Space Weather Alerts | NOAA SWPC | `useSpaceWeatherAlerts` | Dashboard widget + catalogue |
+| CME Events | NASA DONKI | `useCME` | Dashboard widget + signal page |
+| Solar Wind Speed | NOAA SWPC | `useSolarWind` | Dashboard widget + signal page |
+| Solar Wind Density | NOAA SWPC | `useSolarWind` | Dashboard widget + shared signal page |
+| Aurora Oval | NOAA SWPC | `useAurora` | Dashboard widget + signal page |
+| GOES X-Ray Flux | NOAA SWPC | `useSolarRadiation` | Dashboard widget + signal page |
+| Solar Radio Flux | NOAA SWPC | `useSolarRadioFlux` | Dashboard widget + catalogue |
 
-```
-src/
-├── app/
-│   ├── router.jsx          createBrowserRouter route tree
-│   ├── routes.js           ROUTES constants
-│   └── Providers.jsx       QueryClientProvider + AuthProvider + DashboardProvider
-├── components/
-│   ├── layout/
-│   │   ├── Shell.jsx               Navbar + <Outlet /> + footer
-│   │   ├── ProtectedRoute.jsx      Auth guard, redirects to /login
-│   │   └── SignalPageLayout.jsx    Shared header for all signal pages
-│   ├── ui/                         Reusable primitives (PixelCard, Skeleton, EmptyState, JsonInspector …)
-│   ├── charts/
-│   │   └── SolarFlareSeverityChart.jsx   Recharts BarChart
-│   └── widgets/                    Domain widgets (ISS, KpIndex, SolarFlare)
-├── context/
-│   ├── AuthContext.jsx             JWT state, localStorage persistence
-│   └── DashboardContext.jsx        Widget config, localStorage persistence
-├── features/
-│   └── dashboard/
-│       ├── DashboardGrid.jsx
-│       ├── WidgetSelector.jsx
-│       └── MissionControlHeader.jsx    Live alert level + stats bar
-├── hooks/                          One React Query hook per signal
-├── lib/
-│   ├── constants.js                SIGNAL, SOURCE, KP_LEVEL, FLARE_CLASS, WIDGET_REGISTRY
-│   ├── formatters.js               Pure utilities (parseTimestamp, classifyKp, flareClassSeverity …)
-│   ├── queryClient.js              TanStack Query defaults
-│   ├── normalizedSignal.js         NormalizedSignal JSDoc typedef
-│   ├── signalRegistry.js           SIGNAL_REGISTRY catalogue (metadata for all signals)
-│   └── alertLevel.js               computeAlertLevel() → CALM / WATCH / STORM / SIGNAL_LOST
-├── pages/                          Route-level page components
-├── services/
-│   ├── api/                        HTTP clients per data source
-│   └── normalizers/                Raw → NormalizedSignal transformers
-│       └── __tests__/              Vitest unit tests for normalizers
-└── styles/
-    ├── globals.css                 CSS resets and base rules
-    └── theme.css                   CSS custom properties (tokens)
-```
+Signal metadata lives in `src/lib/signalRegistry.js`; dashboard defaults live in
+`WIDGET_REGISTRY` inside `src/lib/constants.js`.
 
----
+## Routing And Layout
+
+- Router: `createBrowserRouter` in `src/app/router.jsx`
+- Route constants: `src/app/routes.js`
+- Public route: `/login`
+- Protected app shell: `/`, `/dashboard`, `/signals`, signal pages, sources,
+  alerts, analysis, settings, and about
+- Vercel routing: `vercel.json` rewrites every route to `/index.html`
 
 ## Authentication
 
-- **Provider**: DummyJSON (`POST https://dummyjson.com/auth/login`)
-- **Storage**: `localStorage["helios_auth"]` — `{ user, accessToken }`
-- **Guard**: `ProtectedRoute` in the React Router tree redirects to `/login` if no `accessToken`
-- **Scope**: All routes except `/login` are protected
-- **Test credentials**: `emilys` / `emilyspass`
-
----
+- Provider: DummyJSON auth API
+- Test credentials: `emilys` / `emilyspass`
+- Session storage: `localStorage["helios_auth"]`
+- Guard: `ProtectedRoute` redirects unauthenticated users to `/login`
 
 ## Dashboard Persistence
 
-Widget configuration (enabled state + order) persists independently from auth under `localStorage["helios-deck:dashboard-config"]`. New widgets added to `WIDGET_REGISTRY` in `constants.js` appear automatically with their default enabled state; the persisted config is **merged, not replaced**.
+Dashboard widget configuration persists in localStorage under
+`helios-deck:dashboard-config`. Configuration is merged with `WIDGET_REGISTRY`
+so new registry entries can be introduced without breaking existing saved
+layouts.
 
----
+The dashboard uses `react-grid-layout` for drag and resize behavior.
 
-## CORS Strategy
+## API And Environment Strategy
 
-| Source | Dev | Production |
+| Source | Development | Production |
 |---|---|---|
 | wheretheiss.at | Direct fetch | Direct fetch |
-| NOAA SWPC | Vite proxy `/api/noaa` | Direct (verify) |
-| NASA DONKI | Vite proxy `/api/nasa` | Direct (verify) |
 | DummyJSON | Direct fetch | Direct fetch |
+| NASA DONKI | Vite proxy `/api/nasa` | Direct `https://api.nasa.gov` |
+| NOAA SWPC | Vite proxy `/api/noaa` | Direct `https://services.swpc.noaa.gov` |
 
----
+Environment variable:
 
-## Caching & Polling
+```txt
+VITE_NASA_API_KEY
+```
 
-Each signal has independently tuned `staleTime` and `refetchInterval`:
-
-| Signal | staleTime | refetchInterval |
-|---|---|---|
-| ISS Position | 4 s | 5 s |
-| Kp Index | 3 min | 5 min |
-| Solar Flares | 30 min | (none — manual) |
-
-Multiple components displaying the same signal share one cache entry — zero duplicate network requests.
-
----
-
-## Deployment
-
-- **Host**: Vercel (Static SPA)
-- **Routing**: `vercel.json` rewrites all paths to `index.html` (React Router handles client-side navigation)
-- **Build**: `npm run build` → Vite bundles to `dist/`
-- **Env**: `VITE_NASA_API_KEY` — falls back to `DEMO_KEY` if unset
-
----
+The NASA key is optional and falls back to `DEMO_KEY`, but Vercel deployments
+should define it to avoid DONKI quota issues. Vite environment variables are
+public in the browser bundle.
 
 ## Testing
 
-Vitest (v2) is configured via `vite.config.js` (`test: { globals: true, environment: "node" }`). Unit tests cover all three normalizers at `src/services/normalizers/__tests__/`.
+Vitest is configured in `vite.config.js` with a Node test environment. Normalizer
+tests are pure and do not call the network.
 
-Run tests:
+Run:
+
 ```bash
-npm test          # single run
-npm run test:watch  # watch mode
+npm run test
+```
+
+Deployment checks:
+
+```bash
+npm run build
+npm run lint
+npm run test
 ```

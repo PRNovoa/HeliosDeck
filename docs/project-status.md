@@ -34,5 +34,6 @@ _Last updated: May 6, 2026_
 | React Query hooks | Complete | All live widgets use hooks; no widget fetches directly |
 | Alert level system | Complete | Uses Kp, flares, NOAA alerts, and solar wind |
 | SignalsPage catalogue | Complete | Filters by ALL, LIVE, PENDING, NASA, NOAA, ISS |
-| ComingSoonPage | Complete | Pending feeds are documented as pending, not broken |
-| Vitest normalizer tests | Complete | Pure normalizer coverage, no network calls |
+| Signal detail pages | Complete | ISS, Kp, flares, CME, solar wind, aurora, GOES X-ray, and shared catalogue views |
+| Vitest normalizer tests | Complete | Pure normalizer coverage for all implemented normalizers, no network calls |
+| Vercel readiness audit | Complete | Local build/lint/test, production preview smoke routes, and provider endpoint checks passed |
