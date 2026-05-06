@@ -49,9 +49,23 @@ const CustomTooltip = ({ active, payload }) => {
  *   days {number} - how many days back to query (default 7)
  */
 export function SolarFlareSeverityChart({ days = 7 }) {
-  const { data, isLoading } = useSolarFlares(days);
+  const { data, isLoading, isError, error } = useSolarFlares(days);
 
   if (isLoading) return <SkeletonBlock lines={6} />;
+
+  if (isError) {
+    const message = error instanceof Error ? error.message : String(error);
+    return (
+      <EmptyState
+        message={
+          message.includes("OVER_RATE_LIMIT") || message.includes("429")
+            ? "NASA rate limit reached"
+            : "Solar flare chart unavailable"
+        }
+        icon="*"
+      />
+    );
+  }
 
   const events = data ?? [];
 

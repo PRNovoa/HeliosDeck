@@ -14,18 +14,29 @@ import { classifyKp } from "@/lib/formatters.js";
  * @returns {NormalizedSignal}
  */
 export function normalizeKpIndex(row) {
-  if (!Array.isArray(row) || row.length < 2) {
+  if (!row || typeof row !== "object") {
     return makeError("Invalid row format");
   }
 
-  const [timeTag, kpRaw, status] = row;
+  const isArrayRow = Array.isArray(row);
+  if (isArrayRow && row.length < 2) {
+    return makeError("Invalid row format");
+  }
+
+  const timeTag = isArrayRow ? row[0] : row.time_tag;
+  const kpRaw = isArrayRow ? row[1] : row.Kp;
+  const status = isArrayRow ? row[2] : row.status;
   const kp = parseFloat(kpRaw);
 
   if (isNaN(kp)) {
     return makeError(`Invalid Kp value: ${kpRaw}`);
   }
 
-  const timestamp = timeTag ? new Date(timeTag + " UTC").toISOString() : null;
+  const timestamp = parseNoaaTimestamp(timeTag);
+
+  if (!timestamp) {
+    return makeError(`Invalid Kp timestamp: ${timeTag}`);
+  }
 
   return {
     timestamp,
@@ -40,9 +51,18 @@ export function normalizeKpIndex(row) {
     confidence: null,
     metadata: {
       instrument: "NOAA planetary Kp network",
+      a_running: isArrayRow ? null : row.a_running ?? null,
+      station_count: isArrayRow ? null : row.station_count ?? null,
     },
     error: null,
   };
+}
+
+function parseNoaaTimestamp(value) {
+  if (!value) return null;
+  const raw = String(value);
+  const date = new Date(raw.includes("T") ? `${raw}Z` : `${raw} UTC`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
 function makeError(message) {

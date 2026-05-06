@@ -39,7 +39,11 @@ export function normalizeSolarFlare(raw) {
     return makeError("Missing classType");
   }
 
-  const timestamp = beginTime ? new Date(beginTime).toISOString() : null;
+  const timestamp = parseTimestamp(beginTime);
+
+  if (beginTime && !timestamp) {
+    return makeError(`Invalid beginTime: ${beginTime}`);
+  }
 
   return {
     timestamp,
@@ -49,9 +53,9 @@ export function normalizeSolarFlare(raw) {
       id: flrID ?? null,
       classType,
       severity: flareClassSeverity(classType),
-      beginTime: beginTime ? new Date(beginTime).toISOString() : null,
-      peakTime: peakTime ? new Date(peakTime).toISOString() : null,
-      endTime: endTime ? new Date(endTime).toISOString() : null,
+      beginTime: timestamp,
+      peakTime: parseTimestamp(peakTime),
+      endTime: parseTimestamp(endTime),
       sourceLocation: sourceLocation ?? null,
       instruments: instruments?.map((i) => i.displayName) ?? [],
     },
@@ -77,6 +81,12 @@ export function normalizeSolarFlareArray(rawArray) {
     .map(normalizeSolarFlare)
     .filter((s) => s.error === null)
     .sort((a, b) => (b.value?.severity ?? 0) - (a.value?.severity ?? 0));
+}
+
+function parseTimestamp(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
 function makeError(message) {

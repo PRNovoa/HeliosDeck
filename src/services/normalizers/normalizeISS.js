@@ -44,10 +44,13 @@ export function normalizeISS(raw) {
     return makeError(`Invalid lat/lon: ${latitude}, ${longitude}`);
   }
 
-  // Convert Unix seconds to ISO 8601 UTC
   const isoTimestamp = timestamp
-    ? new Date(Number(timestamp) * 1000).toISOString()
+    ? parseUnixTimestamp(timestamp)
     : new Date().toISOString();
+
+  if (!isoTimestamp) {
+    return makeError(`Invalid timestamp: ${timestamp}`);
+  }
 
   return {
     timestamp: isoTimestamp,
@@ -56,8 +59,8 @@ export function normalizeISS(raw) {
     value: {
       latitude: parsedLat,
       longitude: parsedLon,
-      altitude_km: parseFloat(altitude) || null,
-      velocity_kmh: parseFloat(velocity) || null,
+      altitude_km: toNullableNumber(altitude),
+      velocity_kmh: toNullableNumber(velocity),
       visibility: visibility ?? null,
     },
     unit: "degrees_lat_lon",
@@ -72,6 +75,19 @@ export function normalizeISS(raw) {
 }
 
 // ── Private helpers ───────────────────────────────────────────────────────────
+
+function parseUnixTimestamp(value) {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds)) return null;
+  const date = new Date(seconds * 1000);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function toNullableNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
 /**
  * Build a NormalizedSignal with error set and null value.

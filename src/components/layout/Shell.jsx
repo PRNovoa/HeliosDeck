@@ -45,8 +45,12 @@ export function Shell() {
 
       <HudPanel open={hudOpen} onClose={() => setHudOpen(false)} />
 
-      <main
-        className="relative z-[1] min-h-screen px-3 pb-8 pt-24 sm:px-4 lg:px-5"
+      <motion.main
+        className="relative z-[1] min-h-screen px-3 pb-8 sm:px-4 lg:px-5"
+        animate={{
+          paddingTop: hudOpen ? "25rem" : isHidden ? "1rem" : "5.75rem",
+        }}
+        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         id="main-content"
         tabIndex={-1}
       >
@@ -62,7 +66,7 @@ export function Shell() {
             <Outlet />
           </motion.div>
         </AnimatePresence>
-      </main>
+      </motion.main>
     </div>
   );
 }

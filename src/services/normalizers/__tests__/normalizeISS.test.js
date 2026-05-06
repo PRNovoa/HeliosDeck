@@ -28,7 +28,19 @@ describe("normalizeISS", () => {
 
   it("converts unix timestamp to ISO 8601", () => {
     const result = normalizeISS(validRaw);
-    expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(result.timestamp).toBe("2024-03-16T13:10:00.000Z");
+  });
+
+  it("falls back nullable numeric fields to null", () => {
+    const result = normalizeISS({
+      latitude: "48.32",
+      longitude: "-23.11",
+      altitude: "bad",
+      velocity: undefined,
+    });
+    expect(result.error).toBeNull();
+    expect(result.value.altitude_km).toBeNull();
+    expect(result.value.velocity_kmh).toBeNull();
   });
 
   it("returns error signal for null input", () => {
@@ -40,6 +52,15 @@ describe("normalizeISS", () => {
   it("returns error signal for missing lat/lon", () => {
     const result = normalizeISS({ altitude: 400 });
     expect(result.error).toBeTruthy();
+  });
+
+  it("returns error signal for invalid timestamp", () => {
+    const result = normalizeISS({
+      ...validRaw,
+      timestamp: "not-a-timestamp",
+    });
+    expect(result.error).toBeTruthy();
+    expect(result.value).toBeNull();
   });
 
   it("returns error signal for non-numeric lat/lon", () => {

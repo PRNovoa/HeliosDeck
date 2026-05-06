@@ -6,7 +6,6 @@ import {
   BarChart2,
   Bell,
   Database,
-  Archive,
   Settings,
   Info,
 } from "lucide-react";
@@ -21,11 +20,10 @@ const NAV_ITEMS = [
     end: true,
   },
   { to: ROUTES.SIGNALS, icon: Radio, label: "Signals" },
-  { to: null, icon: BarChart2, label: "Analysis", disabled: true },
-  { to: null, icon: Bell, label: "Alerts", disabled: true },
-  { to: null, icon: Database, label: "Sources", disabled: true },
-  { to: null, icon: Archive, label: "Archive", disabled: true },
-  { to: null, icon: Settings, label: "Settings", disabled: true },
+  { to: ROUTES.ANALYSIS, icon: BarChart2, label: "Analysis" },
+  { to: ROUTES.ALERTS, icon: Bell, label: "Alerts" },
+  { to: ROUTES.SOURCES, icon: Database, label: "Sources" },
+  { to: ROUTES.SETTINGS, icon: Settings, label: "Settings" },
   { separator: true },
   { to: ROUTES.ABOUT, icon: Info, label: "About" },
 ];

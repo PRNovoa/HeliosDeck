@@ -15,12 +15,26 @@ import {
 import { IssPositionWidget } from "@/components/widgets/IssPositionWidget.jsx";
 import { KpIndexWidget } from "@/components/widgets/KpIndexWidget.jsx";
 import { SolarFlareWidget } from "@/components/widgets/SolarFlareWidget.jsx";
+import { SpaceWeatherAlertsWidget } from "@/components/widgets/SpaceWeatherAlertsWidget.jsx";
+import { SolarWindWidget } from "@/components/widgets/SolarWindWidget.jsx";
+import { SolarWindDensityWidget } from "@/components/widgets/SolarWindDensityWidget.jsx";
+import { SolarRadioFluxWidget } from "@/components/widgets/SolarRadioFluxWidget.jsx";
+import { CMEWidget } from "@/components/widgets/CMEWidget.jsx";
+import { AuroraWidget } from "@/components/widgets/AuroraWidget.jsx";
+import { SolarRadiationWidget } from "@/components/widgets/SolarRadiationWidget.jsx";
 import { DashboardCard } from "@/components/ui/DashboardCard.jsx";
 
 const WIDGET_COMPONENTS = {
   [SIGNAL.ISS_COORDINATES]: IssPositionWidget,
   [SIGNAL.KP_INDEX]: KpIndexWidget,
   [SIGNAL.SOLAR_FLARE_EVENTS]: SolarFlareWidget,
+  [SIGNAL.CORONAL_MASS_EJECTIONS]: CMEWidget,
+  [SIGNAL.SPACE_WEATHER_ALERTS]: SpaceWeatherAlertsWidget,
+  [SIGNAL.SOLAR_WIND_SPEED]: SolarWindWidget,
+  [SIGNAL.SOLAR_WIND_DENSITY]: SolarWindDensityWidget,
+  [SIGNAL.AURORAL_OVAL_PROBABILITY]: AuroraWidget,
+  [SIGNAL.SOLAR_RADIATION]: SolarRadiationWidget,
+  [SIGNAL.SOLAR_RADIO_FLUX]: SolarRadioFluxWidget,
 };
 
 const itemVariants = {
@@ -119,11 +133,11 @@ export function DashboardGrid() {
           layouts={layouts}
           breakpoints={DASHBOARD_LAYOUT_BREAKPOINTS}
           cols={DASHBOARD_LAYOUT_COLUMNS}
-          rowHeight={92}
+          rowHeight={78}
           dragConfig={{ enabled: true, handle: ".dragHandle", threshold: 4 }}
           resizeConfig={{ enabled: true, handles: ["se"] }}
           onLayoutChange={handleLayoutChange}
-          margin={[18, 18]}
+          margin={[16, 16]}
           containerPadding={[0, 0]}
           compactor={verticalCompactor}
         >

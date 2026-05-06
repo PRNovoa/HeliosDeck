@@ -89,12 +89,13 @@ export function TopBar({
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        <button
+        <NavLink
+          to={ROUTES.ALERTS}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--surface-border)] bg-[var(--surface-inner)] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-accent-cyan)] hover:text-[var(--color-accent-cyan)]"
           aria-label="Notifications"
         >
           <Bell size={16} />
-        </button>
+        </NavLink>
       </div>
     </header>
   );

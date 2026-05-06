@@ -22,9 +22,12 @@ export function useKpIndex() {
     queryKey: QUERY_KEYS.kp(),
     queryFn: async () => {
       const rows = await fetchKpIndex();
-      // NOAA returns array of arrays; first row is headers, rest are data
-      // We want the most recent data row (last element)
-      const dataRows = Array.isArray(rows) ? rows.slice(1) : [];
+      const dataRows = Array.isArray(rows)
+        ? rows.filter((row) => {
+            if (Array.isArray(row)) return row[0] !== "time_tag";
+            return row && typeof row === "object" && row.time_tag;
+          })
+        : [];
       const latest = dataRows[dataRows.length - 1];
       return normalizeKpIndex(latest);
     },

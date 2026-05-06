@@ -1,60 +1,38 @@
-﻿# Helios Deck — Project Status
+# Helios Deck - Project Status
 
-_Last updated: see git log_
-
----
+_Last updated: May 6, 2026_
 
 ## Signal Implementation Status
 
 | Signal | Topic | Source | Status | Normalizer | Hook | Widget | Page |
 |---|---|---|---|---|---|---|---|
-| ISS Position | ORBIT | wheretheiss.at | ✅ LIVE | normalizeISS.js | useISSPosition.js | IssPositionWidget | ISSPage |
-| Kp Index | GEOMAGNETIC | NOAA SWPC | ✅ LIVE | normalizeKpIndex.js | useKpIndex.js | KpIndexWidget | KpIndexPage |
-| Solar Flares | SOLAR | NASA DONKI | ✅ LIVE | normalizeSolarFlare.js | useSolarFlares.js | SolarFlareWidget + Chart | SolarFlaresPage |
-| CME Events | HELIOSPHERIC | NASA DONKI | ⏳ PENDING | — | — | — | ComingSoonPage |
-| Solar Wind Speed | PLASMA | NOAA SWPC | ⏳ PENDING | — | — | — | ComingSoonPage |
-| Solar Wind Density | PLASMA | NOAA SWPC | ⏳ PENDING | — | — | — | ComingSoonPage |
-| Aurora Oval | GEOMAGNETIC | NOAA SWPC | ⏳ PENDING | — | — | — | ComingSoonPage |
-| Solar Radiation | RADIATION | NOAA SWPC | ⏳ PENDING | — | — | — | ComingSoonPage |
+| ISS Position | ORBIT | wheretheiss.at | LIVE | `normalizeISS.js` | `useISSPosition.js` | `IssPositionWidget` | `ISSPage` |
+| Kp Index | GEOMAGNETIC | NOAA SWPC | LIVE | `normalizeKpIndex.js` | `useKpIndex.js` | `KpIndexWidget` | `KpIndexPage` |
+| Solar Flares | SOLAR | NASA DONKI | LIVE_WITH_KEY | `normalizeSolarFlare.js` | `useSolarFlares.js` | `SolarFlareWidget` + chart | `SolarFlaresPage` |
+| Space Weather Alerts | GEOMAGNETIC | NOAA SWPC | LIVE | `normalizeSpaceWeatherAlert.js` | `useSpaceWeatherAlerts.js` | `SpaceWeatherAlertsWidget` | Signals catalogue |
+| Solar Wind Speed | PLASMA | NOAA SWPC | LIVE | `normalizeSolarWind.js` | `useSolarWind.js` | `SolarWindWidget` | `SolarWindPage` |
+| Solar Wind Density | PLASMA | NOAA SWPC | LIVE | Included inside `normalizeSolarWind.js` | `useSolarWind.js` | `SolarWindDensityWidget` | `SolarWindPage` |
+| Solar Radio Flux | SOLAR | NOAA SWPC | LIVE | `normalizeSolarRadioFlux.js` | `useSolarRadioFlux.js` | `SolarRadioFluxWidget` | Signals catalogue |
+| CME Events | HELIOSPHERIC | NASA DONKI | LIVE_WITH_KEY | `normalizeCME.js` | `useCME.js` | `CMEWidget` | `CMEPage` |
+| Aurora Oval | GEOMAGNETIC | NOAA SWPC | LIVE | `normalizeAurora.js` | `useAurora.js` | `AuroraWidget` | `AuroraPage` |
+| Solar Radiation | RADIATION | NOAA SWPC | LIVE | `normalizeSolarRadiation.js` | `useSolarRadiation.js` | `SolarRadiationWidget` | `SolarRadiationPage` |
 
----
+## Remaining External Constraints
 
-## Pending Signal Blockers
-
-### CME Events
-- **Blocker**: CME analysis time fields are complex (multiple instruments, speed estimates per model)
-- **Next step**: Create `normalizeCME.js`, `fetchCME` client call, `useCME` hook, and `CMEWidget`
-
-### Solar Wind Speed / Density
-- **Blocker**: NOAA SWPC CORS in production environment unverified
-- **Next step**: Verify NOAA SWPC CORS on Vercel production, then create `normalizeSolarWind.js` and `SolarWindWidget`
-
-### Aurora Oval
-- **Blocker**: Ovation aurora JSON is a large geospatial lat/lon grid requiring a map projection component
-- **Next step**: Evaluate lightweight canvas/SVG world map approach, then create `normalizeAurora.js`
-
-### Solar Radiation
-- **Blocker**: GOES X-ray flux data is a high-frequency time series requiring a Recharts `LineChart`
-- **Next step**: Create `normalizeRadiation.js` and `RadiationChart`
-
----
+- NASA DONKI feeds depend on NASA API quota. `DEMO_KEY` can return `OVER_RATE_LIMIT`; the widgets show this as a quota/key state instead of a broken signal.
+- NOAA CORS should still be verified on the deployed production host. Local development uses the Vite NOAA proxy.
 
 ## Feature Status
 
 | Feature | Status | Notes |
 |---|---|---|
-| Router (createBrowserRouter) | ✅ Complete | React Router v7 |
-| DummyJSON auth + ProtectedRoute | ✅ Complete | localStorage session |
-| Dashboard widget config | ✅ Complete | localStorage persistence, merge strategy |
-| Signal registry catalogue | ✅ Complete | `signalRegistry.js` — single source of truth |
-| NormalizedSignal contract | ✅ Complete | `normalizedSignal.js` JSDoc typedef |
-| Alert level system | ✅ Complete | CALM / WATCH / STORM / SIGNAL_LOST |
-| MissionControlHeader | ✅ Complete | Live alert, widget count, last sync |
-| SignalPageLayout | ✅ Complete | Shared header for all signal pages |
-| JsonInspector | ✅ Complete | Raw signal viewer on all signal pages |
-| SolarFlareSeverityChart | ✅ Complete | Recharts BarChart, coloured by class |
-| SignalsPage catalog | ✅ Complete | Filter buttons, full table from registry |
-| ComingSoonPage (rich) | ✅ Complete | Shows pendingReason, nextStep, API endpoint |
-| Vitest normalizer tests | ✅ Complete | 11 tests across 3 normalizers |
-| Docs (architecture.md) | ✅ Complete | |
-| Docs (project-status.md) | ✅ Complete | |
+| Router (`createBrowserRouter`) | Complete | React Router v7; `/` and `/dashboard` render the dashboard |
+| DummyJSON auth + ProtectedRoute | Complete | User session persisted in localStorage |
+| Dashboard widget config | Complete | Per-user localStorage persistence, react-grid-layout drag/resize |
+| Signal registry catalogue | Complete | `signalRegistry.js` is the source of truth |
+| NormalizedSignal contract | Complete | Shared eight-field contract documented in `normalizedSignal.js` |
+| React Query hooks | Complete | All live widgets use hooks; no widget fetches directly |
+| Alert level system | Complete | Uses Kp, flares, NOAA alerts, and solar wind |
+| SignalsPage catalogue | Complete | Filters by ALL, LIVE, PENDING, NASA, NOAA, ISS |
+| ComingSoonPage | Complete | Pending feeds are documented as pending, not broken |
+| Vitest normalizer tests | Complete | Pure normalizer coverage, no network calls |

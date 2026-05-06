@@ -106,6 +106,32 @@ export const SIGNAL_REGISTRY = [
     nextStep: null,
   },
   {
+    id: SIGNAL.SPACE_WEATHER_ALERTS,
+    label: "Space Weather Alerts",
+    icon: "⚠",
+    topic: SIGNAL_TOPIC.GEOMAGNETIC,
+    provider: "NOAA Space Weather Prediction Center",
+    source: SOURCE.NOAA_SWPC,
+    sourceLabel: "NOAA SWPC",
+    sourceUrl: "https://www.swpc.noaa.gov",
+    apiEndpoint: "https://services.swpc.noaa.gov/products/alerts.json",
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
+    unit: "alert",
+    cadenceSeconds: 300,
+    route: ROUTES.SIGNALS,
+    requiresKey: false,
+    corsStatus: "verify",
+    relatedSignals: [
+      SIGNAL.KP_INDEX,
+      SIGNAL.SOLAR_WIND_SPEED,
+      SIGNAL.SOLAR_FLARE_EVENTS,
+      SIGNAL.AURORAL_OVAL_PROBABILITY,
+    ],
+    pendingReason: null,
+    nextStep: null,
+  },
+  {
     id: SIGNAL.CORONAL_MASS_EJECTIONS,
     label: "CME Events",
     icon: "💥",
@@ -115,8 +141,8 @@ export const SIGNAL_REGISTRY = [
     sourceLabel: "NASA DONKI",
     sourceUrl: "https://kauai.ccmc.gsfc.nasa.gov/DONKI",
     apiEndpoint: "https://api.nasa.gov/DONKI/CME",
-    status: SIGNAL_STATUS.PENDING,
-    implemented: false,
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
     unit: "km/s (CME speed)",
     cadenceSeconds: 3600,
     route: ROUTES.CME,
@@ -127,12 +153,8 @@ export const SIGNAL_REGISTRY = [
       SIGNAL.SOLAR_FLARE_EVENTS,
       SIGNAL.AURORAL_OVAL_PROBABILITY,
     ],
-    pendingReason:
-      "The /DONKI/CME endpoint shares the NASA API key with solar flares. " +
-      "CME analysis time fields are more complex (multiple instruments, " +
-      "speed estimates per model). Normalizer design is non-trivial.",
-    nextStep:
-      "Create normalizeCME.js, fetchCME client call, useCME hook and CMEWidget component.",
+    pendingReason: null,
+    nextStep: null,
   },
   {
     id: SIGNAL.SOLAR_WIND_SPEED,
@@ -145,19 +167,16 @@ export const SIGNAL_REGISTRY = [
     sourceUrl: "https://www.swpc.noaa.gov",
     apiEndpoint:
       "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json",
-    status: SIGNAL_STATUS.PENDING,
-    implemented: false,
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
     unit: "km/s",
     cadenceSeconds: 60,
     route: ROUTES.SOLAR_WIND,
     requiresKey: false,
     corsStatus: "verify",
     relatedSignals: [SIGNAL.KP_INDEX, SIGNAL.AURORAL_OVAL_PROBABILITY],
-    pendingReason:
-      "NOAA SWPC CORS behaviour differs between environments. " +
-      "The Vite proxy handles dev but production CORS must be verified.",
-    nextStep:
-      "Verify NOAA SWPC CORS in Vercel production, then create normalizeSolarWind.js and SolarWindWidget.",
+    pendingReason: null,
+    nextStep: null,
   },
   {
     id: SIGNAL.SOLAR_WIND_DENSITY,
@@ -170,19 +189,16 @@ export const SIGNAL_REGISTRY = [
     sourceUrl: "https://www.swpc.noaa.gov",
     apiEndpoint:
       "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json",
-    status: SIGNAL_STATUS.PENDING,
-    implemented: false,
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
     unit: "p/cm³",
     cadenceSeconds: 60,
     route: ROUTES.SOLAR_WIND,
     requiresKey: false,
     corsStatus: "verify",
     relatedSignals: [SIGNAL.KP_INDEX],
-    pendingReason:
-      "Same endpoint and CORS blocker as Solar Wind Speed. " +
-      "Density is a separate column in the same NOAA plasma file.",
-    nextStep:
-      "Implement Solar Wind Speed first. Density is a secondary field in the same normalizer.",
+    pendingReason: null,
+    nextStep: null,
   },
   {
     id: SIGNAL.AURORAL_OVAL_PROBABILITY,
@@ -195,19 +211,16 @@ export const SIGNAL_REGISTRY = [
     sourceUrl: "https://www.swpc.noaa.gov",
     apiEndpoint:
       "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json",
-    status: SIGNAL_STATUS.PENDING,
-    implemented: false,
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
     unit: "% probability",
     cadenceSeconds: 300,
     route: ROUTES.AURORA,
     requiresKey: false,
     corsStatus: "verify",
     relatedSignals: [SIGNAL.KP_INDEX, SIGNAL.SOLAR_WIND_SPEED],
-    pendingReason:
-      "Ovation aurora JSON is a large geospatial dataset (lat/lon grid). " +
-      "Rendering auroral oval probability requires a map projection component not yet implemented.",
-    nextStep:
-      "Evaluate a lightweight canvas/SVG world map approach. Create normalizeAurora.js.",
+    pendingReason: null,
+    nextStep: null,
   },
   {
     id: SIGNAL.SOLAR_RADIATION,
@@ -220,19 +233,37 @@ export const SIGNAL_REGISTRY = [
     sourceUrl: "https://www.swpc.noaa.gov",
     apiEndpoint:
       "https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json",
-    status: SIGNAL_STATUS.PENDING,
-    implemented: false,
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
     unit: "W/m²",
     cadenceSeconds: 60,
     route: ROUTES.SOLAR_RADIATION,
     requiresKey: false,
     corsStatus: "verify",
     relatedSignals: [],
-    pendingReason:
-      "GOES X-ray flux data requires parsing time-series JSON with high-frequency samples. " +
-      "A Recharts line chart is the appropriate visualisation.",
-    nextStep:
-      "Create normalizeRadiation.js and a RadiationChart using Recharts LineChart.",
+    pendingReason: null,
+    nextStep: null,
+  },
+  {
+    id: SIGNAL.SOLAR_RADIO_FLUX,
+    label: "Solar Radio Flux",
+    icon: "📡",
+    topic: SIGNAL_TOPIC.SOLAR,
+    provider: "NOAA Space Weather Prediction Center",
+    source: SOURCE.NOAA_SWPC,
+    sourceLabel: "NOAA SWPC",
+    sourceUrl: "https://www.swpc.noaa.gov",
+    apiEndpoint: "https://services.swpc.noaa.gov/json/f107_cm_flux.json",
+    status: SIGNAL_STATUS.LIVE,
+    implemented: true,
+    unit: "sfu",
+    cadenceSeconds: 86400,
+    route: ROUTES.SIGNALS,
+    requiresKey: false,
+    corsStatus: "verify",
+    relatedSignals: [SIGNAL.SOLAR_FLARE_EVENTS, SIGNAL.SOLAR_RADIATION],
+    pendingReason: null,
+    nextStep: null,
   },
 ];
 

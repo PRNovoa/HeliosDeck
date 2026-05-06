@@ -44,12 +44,34 @@ export function SolarFlareWidget({ days = 7 }) {
   }
 
   if (isError) {
+    const message = error instanceof Error ? error.message : String(error);
+    const isRateLimited =
+      message.includes("OVER_RATE_LIMIT") || message.includes("429");
+
     return (
       <DashboardCard
         title="SOLAR FLARE SUMMARY"
         accent="var(--color-accent-red)"
       >
-        <ErrorFallback error={error} signal="Solar Flares" onRetry={refetch} />
+        {isRateLimited ? (
+          <div role="status" className="flex flex-col gap-4">
+            <EmptyState
+              message="NASA DEMO_KEY rate limit reached"
+              icon="*"
+            />
+            <p className="text-center text-xs leading-5 text-[var(--color-text-muted)]">
+              Add `VITE_NASA_API_KEY` in `.env.local` for a higher DONKI quota.
+            </p>
+            <button
+              className="mx-auto text-xs font-bold uppercase tracking-widest text-[var(--color-accent-red)] border border-[var(--color-accent-red)] rounded px-3 py-1 bg-transparent hover:bg-[var(--color-accent-red-dim)] transition-colors"
+              onClick={refetch}
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <ErrorFallback error={error} signal="Solar Flares" onRetry={refetch} />
+        )}
       </DashboardCard>
     );
   }

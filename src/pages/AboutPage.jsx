@@ -13,9 +13,9 @@
     url: "https://www.swpc.noaa.gov",
     cors: "Verify prod",
     key: "None",
-    signal: "kp_index, solar_wind, aurora, radiation",
-    normalizer: "normalizeKpIndex.js",
-    hook: "useKpIndex.js",
+    signal: "kp_index, alerts, solar_wind, f107_flux",
+    normalizer: "Kp, Alerts, SolarWind, RadioFlux",
+    hook: "useKpIndex, useSpaceWeatherAlerts, useSolarWind, useSolarRadioFlux",
   },
   {
     name: "NASA DONKI",
@@ -46,7 +46,7 @@ const STACK = [
   ["Tailwind CSS v4", "CSS-first utility system; tokens in @theme {}"],
   [
     "DummyJSON Auth",
-    "Simulated auth API — no backend required, localStorage session",
+    "Front-end scoped auth integration for the demo user flow, localStorage session",
   ],
 ];
 
@@ -71,15 +71,18 @@ export function AboutPage() {
           WHAT IS THIS?
         </h2>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
-          HELIOS DECK is an 8-bit styled cosmic observatory that aggregates,
+          HELIOS DECK is a front-end scoped adaptation of the professor&apos;s
+          HELIOS DECK track: a cosmic observatory interface that aggregates,
           normalises, and visualises geophysical and heliophysical data from
-          public APIs in real time. It serves as a software engineering
-          portfolio project demonstrating modern front-end patterns applied to
-          scientific data ingestion.
+          public APIs in real time. The implementation focuses on the client
+          application surface, data normalization, routing, protected UI flows,
+          and dashboard interaction model.
         </p>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Built with React, React Router, TanStack Query, Recharts, and Tailwind
-          CSS v4. No backend. No SSR. Everything runs in your browser.
+          CSS v4. Backend and SSR concerns are intentionally outside this
+          delivery scope; the app uses public APIs, Vite proxies, DummyJSON auth,
+          and browser persistence to demonstrate the requested front-end track.
         </p>
       </section>
 
@@ -114,6 +117,13 @@ export function AboutPage() {
       ▼
   User browser
 `}</pre>
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mt-3">
+          The project now integrates multiple independent public space-weather
+          feeds: ISS orbital telemetry, NOAA geomagnetic data, NOAA operational
+          alerts, NASA solar flare events, and NOAA solar plasma/radio flux
+          products. All are normalized to the same signal contract before UI
+          rendering.
+        </p>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mt-3">
           The{" "}
           <code className="font-[var(--font-mono)] text-[0.7rem] px-1 py-0.5 rounded bg-[var(--color-bg-secondary)] text-[var(--color-accent-cyan)]">
@@ -175,7 +185,8 @@ export function AboutPage() {
         </h2>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
           Authentication is handled by the <strong>DummyJSON</strong> REST API
-          (no backend required). A JWT access token is persisted to{" "}
+          as a front-end scoped stand-in for a real identity provider. A JWT
+          access token is persisted to{" "}
           <code className="font-[var(--font-mono)] text-[0.7rem] px-1 py-0.5 rounded bg-[var(--color-bg-secondary)] text-[var(--color-accent-cyan)]">
             localStorage
           </code>{" "}

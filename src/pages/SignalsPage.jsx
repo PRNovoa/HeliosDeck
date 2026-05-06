@@ -1,6 +1,8 @@
 ﻿import { useState } from "react";
 import { Link } from "react-router-dom";
+import { SignalConstellationMap } from "@/components/visualizations/SignalConstellationMap.jsx";
 import { SIGNAL_REGISTRY, SIGNAL_STATUS } from "@/lib/signalRegistry.js";
+import { SOURCE } from "@/lib/constants.js";
 
 const STATUS_COLOURS = {
   [SIGNAL_STATUS.LIVE]: "var(--color-geo-green)",
@@ -8,7 +10,14 @@ const STATUS_COLOURS = {
   [SIGNAL_STATUS.MOCK]: "var(--color-text-muted)",
 };
 
-const FILTERS = ["ALL", SIGNAL_STATUS.LIVE, SIGNAL_STATUS.PENDING];
+const FILTERS = [
+  "ALL",
+  SIGNAL_STATUS.LIVE,
+  SIGNAL_STATUS.PENDING,
+  SOURCE.NASA_DONKI,
+  SOURCE.NOAA_SWPC,
+  SOURCE.ISS_API,
+];
 
 function formatCadence(seconds) {
   if (!seconds) return "—";
@@ -17,20 +26,30 @@ function formatCadence(seconds) {
   return `${Math.round(seconds / 3600)}h`;
 }
 
+function formatFilterLabel(filter) {
+  if (filter === SOURCE.NASA_DONKI) return "NASA";
+  if (filter === SOURCE.NOAA_SWPC) return "NOAA";
+  if (filter === SOURCE.ISS_API) return "ISS";
+  return filter;
+}
+
 export function SignalsPage() {
   const [filter, setFilter] = useState("ALL");
 
-  const visible =
-    filter === "ALL"
-      ? SIGNAL_REGISTRY
-      : SIGNAL_REGISTRY.filter((s) => s.status === filter);
+  const visible = SIGNAL_REGISTRY.filter((s) => {
+    if (filter === "ALL") return true;
+    if ([SIGNAL_STATUS.LIVE, SIGNAL_STATUS.PENDING].includes(filter)) {
+      return s.status === filter;
+    }
+    return s.source === filter;
+  });
 
   const liveCount = SIGNAL_REGISTRY.filter(
     (s) => s.status === SIGNAL_STATUS.LIVE,
   ).length;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-6">
       <header className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-4">
         <h1 className="text-xl font-bold tracking-widest uppercase text-[var(--color-text-primary)]">
           SIGNAL CATALOGUE
@@ -59,11 +78,13 @@ export function SignalsPage() {
               onClick={() => setFilter(f)}
               aria-pressed={filter === f}
             >
-              {f}
+              {formatFilterLabel(f)}
             </button>
           ))}
         </div>
       </header>
+
+      <SignalConstellationMap />
 
       <div className="overflow-x-auto" role="region" aria-label="Signal list">
         <table className="w-full text-xs border-collapse">
@@ -137,10 +158,15 @@ export function SignalsPage() {
                         : "text-[var(--color-text-muted)]"
                     }
                     aria-label={
-                      s.implemented ? "Implemented" : "Not implemented"
+                      s.implemented ? "Implemented" : "Pending implementation"
+                    }
+                    title={
+                      s.implemented
+                        ? "Implemented"
+                        : s.pendingReason || "Pending implementation"
                     }
                   >
-                    {s.implemented ? "✓" : "–"}
+                    {s.implemented ? "✓" : "PENDING"}
                   </span>
                 </td>
               </tr>

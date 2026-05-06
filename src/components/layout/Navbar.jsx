@@ -6,8 +6,12 @@ import { useAuth } from "@/context/AuthContext.jsx";
 const NAV_LINKS = [
   { to: ROUTES.DASHBOARD, label: "DASHBOARD" },
   { to: ROUTES.SIGNALS, label: "SIGNALS" },
+  { to: ROUTES.ANALYSIS, label: "ANALYSIS" },
+  { to: ROUTES.ALERTS, label: "ALERTS" },
+  { to: ROUTES.SOURCES, label: "SOURCES" },
   { to: ROUTES.ISS, label: "ISS" },
   { to: ROUTES.KP_INDEX, label: "KP INDEX" },
+  { to: ROUTES.SETTINGS, label: "SETTINGS" },
   { to: ROUTES.ABOUT, label: "ABOUT" },
 ];
 

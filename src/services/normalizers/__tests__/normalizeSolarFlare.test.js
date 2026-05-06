@@ -33,6 +33,12 @@ describe("normalizeSolarFlare", () => {
     expect(result.value.instruments).toEqual(["GOES 16: SXI-"]);
   });
 
+  it("supports ongoing flares without an end time", () => {
+    const result = normalizeSolarFlare({ ...validRaw, endTime: null });
+    expect(result.error).toBeNull();
+    expect(result.value.endTime).toBeNull();
+  });
+
   it("returns error for null input", () => {
     const result = normalizeSolarFlare(null);
     expect(result.error).toBeTruthy();

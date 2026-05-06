@@ -28,11 +28,12 @@ export function ComingSoonPage({ signalId, signal }) {
           </div>
         )}
         <p className="text-sm text-[var(--color-text-muted)]">
-          This signal page is under construction.
+          This is a documented pending signal, not a broken page. The registry
+          records why it is pending and the next implementation step.
         </p>
       </header>
 
-      <EmptyState message="COMING SOON — check back later" icon="🚧" />
+      <EmptyState message="PENDING SIGNAL - planned for a later iteration" icon="*" />
 
       {meta && (
         <section className="flex flex-col gap-3" aria-label="Signal details">

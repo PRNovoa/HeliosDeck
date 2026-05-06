@@ -3,6 +3,8 @@ import { RotateCcw, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useKpIndex } from "@/hooks/useKpIndex.js";
 import { useSolarFlares } from "@/hooks/useSolarFlares.js";
 import { useISSPosition } from "@/hooks/useISSPosition.js";
+import { useSpaceWeatherAlerts } from "@/hooks/useSpaceWeatherAlerts.js";
+import { useSolarWind } from "@/hooks/useSolarWind.js";
 import { useDashboard } from "@/context/useDashboard.js";
 import { computeAlertLevel, ALERT_COLOURS } from "@/lib/alertLevel.js";
 import { formatRelativeTime } from "@/lib/formatters.js";
@@ -11,18 +13,30 @@ export function MissionControlHeader({ onConfigure, panelOpen }) {
   const { data: kpData } = useKpIndex();
   const { data: flareData } = useSolarFlares(7);
   const { data: issData } = useISSPosition();
+  const { data: alertData } = useSpaceWeatherAlerts();
+  const { data: windData } = useSolarWind();
   const { getSortedWidgets, resetLayout } = useDashboard();
 
   const { level, reason } = computeAlertLevel({
     kpData: kpData ?? null,
     solarFlareData: flareData ?? null,
     issData: issData ?? null,
+    spaceWeatherAlerts: alertData ?? null,
+    solarWindData: windData ?? null,
   });
 
   const enabledWidgets = getSortedWidgets(true).length;
-  const liveSources = [kpData, flareData, issData].filter(Boolean).length;
+  const liveSources = [kpData, flareData, issData, alertData, windData].filter(
+    Boolean,
+  ).length;
 
-  const timestamps = [kpData?.timestamp, issData?.timestamp].filter(Boolean);
+  const timestamps = [
+    kpData?.timestamp,
+    issData?.timestamp,
+    flareData?.[0]?.timestamp,
+    alertData?.[0]?.timestamp,
+    windData?.at(-1)?.timestamp,
+  ].filter(Boolean);
   const latestMs = timestamps.length
     ? Math.max(
         ...timestamps.map((t) => new Date(t).getTime()).filter(Number.isFinite),
@@ -67,7 +81,7 @@ export function MissionControlHeader({ onConfigure, panelOpen }) {
         </div>
 
         <Metric label="Widgets" value={enabledWidgets} />
-        <Metric label="Sources" value={`${liveSources}/3`} />
+        <Metric label="Sources" value={`${liveSources}/5`} />
         <Metric label="Sync" value={lastSync} />
 
         <button

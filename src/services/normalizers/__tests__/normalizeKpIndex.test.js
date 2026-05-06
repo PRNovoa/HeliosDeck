@@ -13,6 +13,19 @@ describe("normalizeKpIndex", () => {
     expect(result.unit).toBe("Kp");
   });
 
+  it("parses the current NOAA object payload shape", () => {
+    const row = {
+      time_tag: "2026-05-06T15:00:00",
+      Kp: 0.67,
+      a_running: 3,
+      station_count: 8,
+    };
+    const result = normalizeKpIndex(row);
+    expect(result.error).toBeNull();
+    expect(result.value.kp).toBe(0.67);
+    expect(result.metadata.station_count).toBe(8);
+  });
+
   it("classifies Kp 0 as quiet", () => {
     const row = ["2025-03-16 00:00:00.000", "0.00", "observed"];
     const result = normalizeKpIndex(row);
@@ -23,6 +36,13 @@ describe("normalizeKpIndex", () => {
     const row = ["2025-03-16 06:00:00.000", "5.00", "observed"];
     const result = normalizeKpIndex(row);
     expect(result.value.level).toBe("minor");
+  });
+
+  it("defaults missing status to unknown", () => {
+    const row = ["2025-03-16 06:00:00.000", "2.00"];
+    const result = normalizeKpIndex(row);
+    expect(result.error).toBeNull();
+    expect(result.value.status).toBe("unknown");
   });
 
   it("returns error for non-array input", () => {
